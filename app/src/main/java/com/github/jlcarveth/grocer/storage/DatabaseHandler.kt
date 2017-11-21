@@ -48,11 +48,20 @@ class DatabaseHandler : SQLiteOpenHelper {
             val checked = (ci==1)
 
             val g = GroceryItem(name,note,qty,checked)
+            g.id = id.toLong()
 
             al.add(g)
         }
 
         return al
+    }
+
+    /**
+     * Removes all entries from the grocery table
+     */
+    fun clearGroceries() {
+        writableDatabase.delete(GroceryEntry.TABLE_NAME, null, null)
+        dataUpdated()
     }
 
     /**
@@ -62,7 +71,7 @@ class DatabaseHandler : SQLiteOpenHelper {
         val db = this.writableDatabase
         val values = ContentValues()
 
-        values.put(GroceryEntry.TABLE_NAME,g.name)
+        values.put(GroceryEntry.COLUMN_NAME,g.name)
         values.put(GroceryEntry.COLUMN_NOTE,g.note)
         values.put(GroceryEntry.COLUMN_QTY, g.qty)
 
@@ -75,7 +84,25 @@ class DatabaseHandler : SQLiteOpenHelper {
         val row : Long = db.insert(GroceryEntry.TABLE_NAME, null, values)
         dataUpdated()
 
+        g.id = row
+
         return (row > 0)
+    }
+
+    /**
+     * Sets the specified row's checked field to true
+     */
+    fun checkGroceryItem(g : GroceryItem) {
+        val db = this.writableDatabase
+        val values = ContentValues()
+
+        values.put(GroceryEntry.COLUMN_NAME, g.name)
+        values.put(GroceryEntry.COLUMN_NOTE, g.note)
+        values.put(GroceryEntry.COLUMN_QTY, g.qty)
+        values.put(GroceryEntry.COLUMN_CHKD, true)
+
+        db.update(GroceryEntry.TABLE_NAME,
+                values, "${GroceryEntry._ID} = '${g.id}'", null)
     }
 
     /**

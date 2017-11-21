@@ -8,19 +8,14 @@ import android.util.Log
 /**
  * Created by John on 11/14/2017.
  *
- * Our Class that handles the callbacks from the listeners.
+ * Class that handles the callbacks from the listeners.
  * This class allows for some customization on the functionality of
  * the swiping / dragging behaviours.
  */
 
 val TAG : String = "TouchHelperCallback"
 
-class SimpleTouchHelperCallback : ItemTouchHelper.Callback {
-    lateinit var adapter : ItemTouchHelperAdapter
-
-    constructor(adapter : ItemTouchHelperAdapter) {
-        this.adapter = adapter
-    }
+class SimpleTouchHelperCallback(private val adapter: ItemTouchHelperAdapter) : ItemTouchHelper.Callback() {
 
     override fun isLongPressDragEnabled(): Boolean = false
 
@@ -33,10 +28,13 @@ class SimpleTouchHelperCallback : ItemTouchHelper.Callback {
         return makeMovementFlags(dragFlags, swipeFlags)
     }
 
-    override fun onMove(recyclerView: RecyclerView?, viewHolder: RecyclerView.ViewHolder?, target: RecyclerView.ViewHolder?): Boolean {
+    override fun onMove(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder?, target: RecyclerView.ViewHolder?): Boolean {
         if (viewHolder?.itemViewType != target?.itemViewType) return false
 
-        adapter.onItemMove(viewHolder!!.adapterPosition, target!!.adapterPosition)
+        if (viewHolder != null && target != null) {
+            adapter.onItemMove(viewHolder.adapterPosition, target.adapterPosition)
+        }
+
 
         return true
     }
@@ -44,17 +42,18 @@ class SimpleTouchHelperCallback : ItemTouchHelper.Callback {
     /**
      * Called when a ViewHolder is swiped by the user.
      */
-    override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
-        Log.d(TAG, "Swiped @ ${viewHolder.adapterPosition}");
-        adapter.onItemDismiss(viewHolder.adapterPosition)
+    override fun onSwiped(viewHolder: RecyclerView.ViewHolder?, direction: Int) {
+        Log.d(TAG, "Swiped @ ${viewHolder!!.adapterPosition}");
+
+        adapter?.onItemDismiss(viewHolder.adapterPosition)
     }
 
     /**
      * Called by ItemTouchelper on RecyclerView's onDraw callback
      */
-    override fun onChildDraw(c: Canvas, recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder, dX: Float, dY: Float, actionState: Int, isCurrentlyActive: Boolean) {
+    override fun onChildDraw(c: Canvas, recyclerView: RecyclerView?, viewHolder: RecyclerView.ViewHolder?, dX: Float, dY: Float, actionState: Int, isCurrentlyActive: Boolean) {
         if (actionState == ItemTouchHelper.ACTION_STATE_SWIPE) {
-            val alpha: Float = 1.0F - Math.abs(dX) / viewHolder.itemView.width
+            val alpha: Float = 1.0F - Math.abs(dX) / viewHolder!!.itemView.width
             viewHolder.itemView.alpha = alpha
             viewHolder.itemView.translationX = dX
         } else {
@@ -62,19 +61,7 @@ class SimpleTouchHelperCallback : ItemTouchHelper.Callback {
         }
     }
 
-    /**
-     * Called when the ViewHolder swiped or dragged by the ItemTouchHelper is changed
-     */
-    override fun onSelectedChanged(viewHolder: RecyclerView.ViewHolder?, actionState: Int) {
-        // We only want the active item to change
-        if (actionState != ItemTouchHelper.ACTION_STATE_IDLE) {
-            if (viewHolder is ItemTouchHelperViewHolder) {
-                viewHolder.onItemSelected()
-            }
-        }
-
-        super.onSelectedChanged(viewHolder, actionState)
-    }
+    
 
     /**
      * Called when a view is cleared (swiped to dismiss)
@@ -85,7 +72,7 @@ class SimpleTouchHelperCallback : ItemTouchHelper.Callback {
         viewHolder.itemView.alpha =1.0F
 
         if (viewHolder is ItemTouchHelperViewHolder) {
-            viewHolder.onItemClear()
+            viewHolder?.onItemClear()
         }
 
     }

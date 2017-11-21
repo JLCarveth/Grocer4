@@ -1,9 +1,10 @@
 package com.github.jlcarveth.grocer.layout.fragment;
 
+import android.app.Fragment;
+import android.content.ClipData;
 import android.content.Context;
 import android.os.Bundle;
-import android.app.Fragment;
-import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
@@ -12,14 +13,17 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.github.jlcarveth.grocer.R;
-import com.github.jlcarveth.grocer.layout.fragment.dummy.DummyContent;
-import com.github.jlcarveth.grocer.layout.fragment.dummy.DummyContent.DummyItem;
 import com.github.jlcarveth.grocer.model.GroceryItem;
 import com.github.jlcarveth.grocer.storage.DatabaseHandler;
+import com.github.jlcarveth.grocer.storage.DatabaseObserver;
+import com.github.jlcarveth.grocer.storage.DatabaseSubject;
+import com.github.jlcarveth.grocer.util.recycler.OnStartDragListener;
+import com.github.jlcarveth.grocer.util.recycler.SimpleTouchHelperCallback;
 
-import java.lang.reflect.Array;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
 import java.util.ArrayList;
-import java.util.List;
 
 /**
  * A fragment representing a list of Items.
@@ -27,7 +31,7 @@ import java.util.List;
  * Activities containing this fragment MUST implement the {@link OnListFragmentInteractionListener}
  * interface.
  */
-public class GroceryListFragment extends Fragment {
+public class GroceryListFragment extends Fragment implements OnStartDragListener, DatabaseObserver {
 
     private OnListFragmentInteractionListener mListener;
 
@@ -53,14 +57,9 @@ public class GroceryListFragment extends Fragment {
     }
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-    }
-
-    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_grocerylist_list, container, false);
+        View view = inflater.inflate(R.layout.fragment_grocerylist, container, false);
 
         rv = view.findViewById(R.id.grocery_list);
 
@@ -73,8 +72,20 @@ public class GroceryListFragment extends Fragment {
             Context context = view.getContext();
             RecyclerView recyclerView = (RecyclerView) view;
             recyclerView.setLayoutManager(new LinearLayoutManager(context));
-            recyclerView.setAdapter(new GroceryListRecyclerViewAdapter(dataset, mListener));
+
+            adapter = new GroceryListRecyclerViewAdapter(dataset,mListener,this);
+            recyclerView.setAdapter(adapter);
         }
+
+        ItemTouchHelper.Callback callback = new SimpleTouchHelperCallback(adapter);
+        ith = new ItemTouchHelper(callback);
+        ith.attachToRecyclerView(rv);
+
+        DividerItemDecoration div = new DividerItemDecoration(rv.getContext(),
+                DividerItemDecoration.VERTICAL);
+
+        rv.addItemDecoration(div);
+
         return view;
     }
 
@@ -88,12 +99,32 @@ public class GroceryListFragment extends Fragment {
             throw new RuntimeException(context.toString()
                     + " must implement OnListFragmentInteractionListener");
         }
+
+        DatabaseSubject.Companion.attach(this);
     }
 
     @Override
     public void onDetach() {
         super.onDetach();
         mListener = null;
+
+        DatabaseSubject.Companion.detach(this);
+    }
+
+    @Override
+    public void onStartDrag(@NotNull RecyclerView.ViewHolder viewHolder) {
+        ith.startDrag(viewHolder);
+    }
+
+    /**
+     * From our DatabaseObserver interface
+     * Updates the data in the RecyclerView
+     */
+    @Override
+    public void update() {
+        dataset.clear();
+        dataset.addAll(dh.getGroceries());
+        adapter.notifyDataSetChanged();
     }
 
     /**

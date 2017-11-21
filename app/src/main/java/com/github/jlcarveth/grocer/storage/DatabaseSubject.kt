@@ -1,5 +1,7 @@
 package com.github.jlcarveth.grocer.storage
 
+import android.util.Log
+
 /**
  * Created by John on 11/10/2017.
  *
@@ -7,12 +9,14 @@ package com.github.jlcarveth.grocer.storage
  * and tells them when the database has changed and that they should update their
  * data.
  */
+val TAG = "DatabaseSubject"
+
 class DatabaseSubject {
     companion object {
         private val observers = ArrayList<DatabaseObserver>()
 
         fun attach(observer : DatabaseObserver) {
-            observer
+            observers.add(observer)
         }
 
         fun detach(observer : DatabaseObserver) {
@@ -21,6 +25,8 @@ class DatabaseSubject {
 
         fun notifyObservers() {
             val it = observers.iterator()
+
+            Log.d(TAG, "Notifying Observers {${observers.size}}")
 
             while (it.hasNext()) {
                 it.next().update()

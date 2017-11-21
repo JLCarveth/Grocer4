@@ -17,7 +17,8 @@
             android:layout_height="wrap_content"
             android:layout_margin="@dimen/text_margin"
             android:text="Name"
-            android:textAppearance="?attr/textAppearanceListItem" />
+            android:textAppearance="@style/TextAppearance.AppCompat.Large"
+            android:textColor="@color/colorText"/>
 
         <TextView
             android:id="@+id/gl_note"
@@ -25,7 +26,8 @@
             android:layout_height="wrap_content"
             android:layout_margin="@dimen/text_margin"
             android:text="Note"
-            android:textAppearance="?attr/textAppearanceListItem" />
+            android:textAppearance="?attr/textAppearanceListItem"
+            android:textColor="@color/colorTextSecondary"/>
     </LinearLayout>
 
     <Space

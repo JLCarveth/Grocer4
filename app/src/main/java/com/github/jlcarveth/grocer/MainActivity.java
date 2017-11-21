@@ -5,6 +5,7 @@ import android.app.FragmentManager;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.util.Log;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -14,10 +15,19 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+
+import com.github.jlcarveth.grocer.layout.fragment.AddGroceryDialog;
 import com.github.jlcarveth.grocer.layout.fragment.GroceryListFragment;
+import com.github.jlcarveth.grocer.model.GroceryItem;
+import com.github.jlcarveth.grocer.storage.DatabaseHandler;
+import com.github.jlcarveth.grocer.storage.DatabaseSubject;
 
 public class MainActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener {
+        implements NavigationView.OnNavigationItemSelectedListener,
+        GroceryListFragment.OnListFragmentInteractionListener{
+
+    private static final String TAG = "GrocerMainActivity";
+    private DatabaseHandler databaseHandler;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -30,8 +40,8 @@ public class MainActivity extends AppCompatActivity
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
+                AddGroceryDialog agd = new AddGroceryDialog();
+                agd.show(getFragmentManager(), "ADD_DIAG");
             }
         });
 
@@ -49,6 +59,8 @@ public class MainActivity extends AppCompatActivity
                 .replace(R.id.content, fragment, "GROCERY")
                 .addToBackStack(null)
                 .commit();
+
+        databaseHandler = new DatabaseHandler(getApplicationContext());
     }
 
     @Override
@@ -78,6 +90,8 @@ public class MainActivity extends AppCompatActivity
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
             return true;
+        } else if (id == R.id.action_clear_all) {
+            databaseHandler.clearGroceries();
         }
 
         return super.onOptionsItemSelected(item);
@@ -106,5 +120,10 @@ public class MainActivity extends AppCompatActivity
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
+    }
+
+    @Override
+    public void onListFragmentInteraction(GroceryItem item) {
+        Log.d(TAG, "Interaction Detected. Item : " + item.getName());
     }
 }

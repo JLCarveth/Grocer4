@@ -1,0 +1,66 @@
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.github.jlcarveth.grocer.layout.fragment.AddGroceryDialog">
+
+    <TableLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+        <TableRow>
+            <TextView
+                android:id="@+id/ad_name"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="3"
+                android:padding="10dp"
+                android:text="@string/name" />
+
+            <EditText
+                android:id="@+id/ad_name_input"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="7"
+                android:hint="@string/ad_name_hint"
+                android:inputType="text|textCapWords"
+                android:selectAllOnFocus="true"
+                android:singleLine="true" />
+        </TableRow>
+        <TableRow>
+            <TextView
+                android:id="@+id/ad_note"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="3"
+                android:padding="10dp"
+                android:text="@string/note" />
+
+            <EditText
+                android:id="@+id/ad_note_input"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="7"
+                android:hint="@string/ad_note_hint"
+                android:inputType="text|textCapWords"
+                android:selectAllOnFocus="true" />
+        </TableRow>
+        <TableRow>
+            <TextView
+                android:id="@+id/ad_cost"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="3"
+                android:padding="10dp"
+                android:text="@string/qty" />
+
+            <EditText
+                android:id="@+id/ad_qty_input"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="7"
+                android:hint="@string/optional"
+                android:inputType="text|textCapSentences"
+                android:selectAllOnFocus="true" />
+        </TableRow>
+    </TableLayout>
+</FrameLayout>
