@@ -4,6 +4,8 @@ import android.provider.BaseColumns
 
 /**
  * Created by John on 11/10/2017.
+ *
+ * Our Model class for both the Grocery database table and the Grocery Item
  */
 class GroceryEntry : BaseColumns {
     companion object {
@@ -24,12 +26,13 @@ class GroceryEntry : BaseColumns {
 }
 
 class GroceryItem(val name : String, val note : String, val qty : String, var checked : Boolean) : Comparable<GroceryItem>{
+    var id : Long = -99
+
     /**
      * Our object will need to be sorted by lists later.
      * Groceries are sorted alphabetically by name
      */
-    override fun compareTo(other: GroceryItem): Int {
-        return (this.name.compareTo(other.name))
-    }
+    override fun compareTo(other: GroceryItem): Int = (this.name.compareTo(other.name))
 
+    override fun toString(): String = "GroceryItem{name:$name, note:$note, qty:$qty}"
 }

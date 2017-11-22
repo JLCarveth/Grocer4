@@ -1,8 +1,11 @@
 package com.github.jlcarveth.grocer.layout.fragment;
 
 import android.os.Bundle;
+import android.support.v4.view.MotionEventCompat;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
@@ -12,35 +15,54 @@ import android.widget.TextView;
 
 import com.github.jlcarveth.grocer.R;
 import com.github.jlcarveth.grocer.layout.fragment.GroceryListFragment.OnListFragmentInteractionListener;
-import com.github.jlcarveth.grocer.layout.fragment.dummy.DummyContent.DummyItem;
 import com.github.jlcarveth.grocer.model.GroceryItem;
+import com.github.jlcarveth.grocer.storage.DatabaseHandler;
+import com.github.jlcarveth.grocer.util.recycler.ItemTouchHelperAdapter;
+import com.github.jlcarveth.grocer.util.recycler.OnStartDragListener;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 
 /**
- * {@link RecyclerView.Adapter} that can display a {@link DummyItem} and makes a call to the
+ * {@link RecyclerView.Adapter} that can display a {@link GroceryItem} and makes a call to the
  * specified {@link OnListFragmentInteractionListener}.
  * TODO: Replace the implementation with code for your data type.
  */
-public class GroceryListRecyclerViewAdapter extends RecyclerView.Adapter<GroceryListRecyclerViewAdapter.ViewHolder> {
+public class GroceryListRecyclerViewAdapter extends RecyclerView.Adapter<GroceryListRecyclerViewAdapter.ViewHolder>
+    implements ItemTouchHelperAdapter {
 
     private final ArrayList<GroceryItem> mValues;
     private final OnListFragmentInteractionListener mListener;
+    private final OnStartDragListener dragListener;
 
-    public GroceryListRecyclerViewAdapter(ArrayList<GroceryItem> items, OnListFragmentInteractionListener listener) {
+    private DatabaseHandler dh;
+
+    private final String TAG = "GRecyclerViewAdapter";
+
+    public GroceryListRecyclerViewAdapter(ArrayList<GroceryItem> items,
+                                          OnListFragmentInteractionListener listener,
+                                          GroceryListFragment groceryListFragment) {
         mValues = items;
         mListener = listener;
+        dragListener = (OnStartDragListener) groceryListFragment;
+
+        dh = new DatabaseHandler(groceryListFragment.getActivity());
     }
 
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.fragment_grocerylist, parent, false);
+                .inflate(R.layout.grocery_item, parent, false);
         return new ViewHolder(view);
     }
 
     @Override
     public void onBindViewHolder(final ViewHolder holder, int position) {
+        if (holder == null) {
+            return;
+        }
+
         GroceryItem item = mValues.get(position);
         System.out.println("onBindViewHolder pos: " + position);
         holder.mNameView.setText(item.getName());
@@ -57,11 +79,42 @@ public class GroceryListRecyclerViewAdapter extends RecyclerView.Adapter<Grocery
                 }
             }
         });
+
+        holder.mDragBars.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                if (MotionEventCompat.getActionMasked(event) == MotionEvent.ACTION_DOWN) {
+                    Log.d(TAG, "Starting drag with " + holder);
+                    dragListener.onStartDrag(holder);
+                }
+                return false;
+            }
+        });
     }
 
     @Override
     public int getItemCount() {
         return mValues.size();
+    }
+
+    @Override
+    public boolean onItemMove(int from, int to) {
+        Collections.swap(mValues, from, to);
+        notifyItemMoved(from, to);
+        return true;
+    }
+
+    @Override
+    public void onItemDismiss(int position) {
+        dh.deleteGroceryItem(mValues.get(position));
+        mValues.clear();
+        mValues.addAll(dh.getGroceries());
+        //notifyItemRemoved(position);
+        notifyDataSetChanged();
+    }
+
+    public boolean isEmpty() {
+        return mValues.isEmpty();
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {
@@ -76,7 +129,6 @@ public class GroceryListRecyclerViewAdapter extends RecyclerView.Adapter<Grocery
 
         public GroceryItem mItem;
 
-        public Bundle args;
 
         public ViewHolder(View view) {
             super(view);
@@ -87,14 +139,14 @@ public class GroceryListRecyclerViewAdapter extends RecyclerView.Adapter<Grocery
             mCheckbox = (CheckBox) view.findViewById(R.id.gl_checkbox);
             mDragBars = (ImageView) view.findViewById(R.id.gl_burger);
 
-            mCheckbox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            /**mCheckbox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
                 @Override
                 public void onCheckedChanged(CompoundButton compoundButton, boolean isChecked) {
                     // Change the value in the list
                     mValues.get(getAdapterPosition()).setChecked(isChecked);
                     //dh.checkEntry(mValues.get(getAdapterPosition()));
                 }
-            });
+            });*/
 
             mView.setOnLongClickListener(new View.OnLongClickListener() {
                 @Override
