@@ -3,7 +3,10 @@ package com.github.jlcarveth.grocer.layout.fragment;
 import android.app.Fragment;
 import android.content.ClipData;
 import android.content.Context;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.support.v4.content.ContextCompat;
+import android.support.v4.content.res.ResourcesCompat;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -11,8 +14,11 @@ import android.support.v7.widget.helper.ItemTouchHelper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import com.github.jlcarveth.grocer.R;
+import com.github.jlcarveth.grocer.layout.decoration.RecyclerViewDivider;
 import com.github.jlcarveth.grocer.model.GroceryItem;
 import com.github.jlcarveth.grocer.storage.DatabaseHandler;
 import com.github.jlcarveth.grocer.storage.DatabaseObserver;
@@ -45,6 +51,8 @@ public class GroceryListFragment extends Fragment implements OnStartDragListener
 
     private DatabaseHandler dh;
 
+    private LinearLayout emptyView;
+
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
      * fragment (e.g. upon screen orientation changes).
@@ -62,29 +70,34 @@ public class GroceryListFragment extends Fragment implements OnStartDragListener
         View view = inflater.inflate(R.layout.fragment_grocerylist, container, false);
 
         rv = view.findViewById(R.id.grocery_list);
+        emptyView = view.findViewById(R.id.empty_view);
 
         dh = new DatabaseHandler(view.getContext());
 
         dataset = dh.getGroceries();
 
-        // Set the adapter
-        if (view instanceof RecyclerView) {
-            Context context = view.getContext();
-            RecyclerView recyclerView = (RecyclerView) view;
-            recyclerView.setLayoutManager(new LinearLayoutManager(context));
+        Context context = view.getContext();
+        rv.setLayoutManager(new LinearLayoutManager(context));
 
-            adapter = new GroceryListRecyclerViewAdapter(dataset,mListener,this);
-            recyclerView.setAdapter(adapter);
-        }
+        adapter = new GroceryListRecyclerViewAdapter(dataset,mListener,this);
+        rv.setAdapter(adapter);
+
 
         ItemTouchHelper.Callback callback = new SimpleTouchHelperCallback(adapter);
         ith = new ItemTouchHelper(callback);
         ith.attachToRecyclerView(rv);
 
-        DividerItemDecoration div = new DividerItemDecoration(rv.getContext(),
-                DividerItemDecoration.VERTICAL);
-
+        Drawable divider = (Drawable) ContextCompat.getDrawable(getActivity(), R.drawable.divider);
+        RecyclerViewDivider div = new RecyclerViewDivider(divider);
         rv.addItemDecoration(div);
+
+        if (dataset.isEmpty()){
+            rv.setVisibility(View.GONE);
+            emptyView.setVisibility(View.VISIBLE);
+        } else {
+            rv.setVisibility(View.VISIBLE);
+            emptyView.setVisibility(View.GONE);
+        }
 
         return view;
     }
@@ -125,6 +138,14 @@ public class GroceryListFragment extends Fragment implements OnStartDragListener
         dataset.clear();
         dataset.addAll(dh.getGroceries());
         adapter.notifyDataSetChanged();
+
+        if (dataset.isEmpty()){
+            rv.setVisibility(View.GONE);
+            emptyView.setVisibility(View.VISIBLE);
+        } else {
+            rv.setVisibility(View.VISIBLE);
+            emptyView.setVisibility(View.GONE);
+        }
     }
 
     /**

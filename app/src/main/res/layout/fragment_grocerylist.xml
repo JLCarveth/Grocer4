@@ -1,18 +1,39 @@
-<?xml version="1.0" encoding="utf-8"?>
-<android.support.v7.widget.RecyclerView
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/grocery_list"
     android:name="com.github.jlcarveth.grocer.layout.fragment.GroceryListFragment"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:layout_marginLeft="0dp"
-    android:layout_marginRight="0dp"
-    app:layoutManager="LinearLayoutManager"
     tools:context="com.github.jlcarveth.grocer.layout.fragment.GroceryListFragment"
-    tools:listitem="@layout/grocery_item"/>
+    android:layout_height="match_parent">
 
-<TextView
-    android:id="@+id/empty_list_view"
-    android:text="@string/empty_list"/>
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/grocery_list"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginLeft="0dp"
+        android:layout_marginRight="0dp"
+        app:layoutManager="LinearLayoutManager"
+        tools:listitem="@layout/grocery_item" />
+
+    <LinearLayout
+        android:id="@+id/empty_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_gravity="center|center_vertical"
+        android:gravity="center"
+        android:visibility="gone"
+        android:orientation="vertical">
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center|center_vertical"
+            android:text="@string/empty_list"
+            android:textColor="@color/colorTextSecondary"/>
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center|center_vertical"
+            android:text="@string/empty_list2"
+            android:textColor="@color/colorTextSecondary"/>
+    </LinearLayout>
+</FrameLayout>

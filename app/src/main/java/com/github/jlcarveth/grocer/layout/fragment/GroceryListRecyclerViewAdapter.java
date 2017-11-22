@@ -1,8 +1,11 @@
 package com.github.jlcarveth.grocer.layout.fragment;
 
 import android.os.Bundle;
+import android.support.v4.view.MotionEventCompat;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
@@ -34,6 +37,8 @@ public class GroceryListRecyclerViewAdapter extends RecyclerView.Adapter<Grocery
     private final OnStartDragListener dragListener;
 
     private DatabaseHandler dh;
+
+    private final String TAG = "GRecyclerViewAdapter";
 
     public GroceryListRecyclerViewAdapter(ArrayList<GroceryItem> items,
                                           OnListFragmentInteractionListener listener,
@@ -72,6 +77,17 @@ public class GroceryListRecyclerViewAdapter extends RecyclerView.Adapter<Grocery
                     // fragment is attached to one) that an item has been selected.
                     mListener.onListFragmentInteraction(holder.mItem);
                 }
+            }
+        });
+
+        holder.mDragBars.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                if (MotionEventCompat.getActionMasked(event) == MotionEvent.ACTION_DOWN) {
+                    Log.d(TAG, "Starting drag with " + holder);
+                    dragListener.onStartDrag(holder);
+                }
+                return false;
             }
         });
     }
