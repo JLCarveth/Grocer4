@@ -1,13 +1,10 @@
 package com.github.jlcarveth.grocer.layout.fragment;
 
 import android.app.Fragment;
-import android.content.ClipData;
 import android.content.Context;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
-import android.support.v4.content.res.ResourcesCompat;
-import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
@@ -15,7 +12,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
-import android.widget.TextView;
 
 import com.github.jlcarveth.grocer.R;
 import com.github.jlcarveth.grocer.layout.decoration.RecyclerViewDivider;
@@ -27,7 +23,6 @@ import com.github.jlcarveth.grocer.util.recycler.OnStartDragListener;
 import com.github.jlcarveth.grocer.util.recycler.SimpleTouchHelperCallback;
 
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 
@@ -38,6 +33,11 @@ import java.util.ArrayList;
  * interface.
  */
 public class GroceryListFragment extends Fragment implements OnStartDragListener, DatabaseObserver {
+
+    /**
+     * For Fragment tagging
+     */
+    public static final String FTAG = "GROCERY";
 
     private OnListFragmentInteractionListener mListener;
 
