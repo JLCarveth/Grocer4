@@ -16,4 +16,13 @@
     <string name="clear_all">Clear All</string>
     <string name="empty_list">Yay! Your shopping list is empty!</string>
     <string name="empty_list2">Click the \'+\' to add an item to the list.</string>
+    <string name="grocery">Shopping List</string>
+    <string name="recipe">Recipe List</string>
+    <string name="help">Help</string>
+    <string name="share">Share</string>
+    <string name="extras">Extras</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="coming_soon">Coming Soon!</string>
 </resources>

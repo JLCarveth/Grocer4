@@ -17,6 +17,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 import com.github.jlcarveth.grocer.layout.fragment.AddGroceryDialog;
+import com.github.jlcarveth.grocer.layout.fragment.DefaultFragment;
 import com.github.jlcarveth.grocer.layout.fragment.GroceryListFragment;
 import com.github.jlcarveth.grocer.model.GroceryItem;
 import com.github.jlcarveth.grocer.storage.DatabaseHandler;
@@ -24,10 +25,12 @@ import com.github.jlcarveth.grocer.storage.DatabaseSubject;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener,
-        GroceryListFragment.OnListFragmentInteractionListener{
+        GroceryListFragment.OnListFragmentInteractionListener {
 
     private static final String TAG = "GrocerMainActivity";
     private DatabaseHandler databaseHandler;
+
+    private String currentFragmentTag = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,7 +59,7 @@ public class MainActivity extends AppCompatActivity
 
         GroceryListFragment fragment = new GroceryListFragment();
         getFragmentManager().beginTransaction()
-                .replace(R.id.content, fragment, "GROCERY")
+                .replace(R.id.content, fragment, fragment.FTAG)
                 .addToBackStack(null)
                 .commit();
 
@@ -102,20 +105,29 @@ public class MainActivity extends AppCompatActivity
     public boolean onNavigationItemSelected(MenuItem item) {
         // Handle navigation view item clicks here.
         int id = item.getItemId();
+        String tag = "";
+        Fragment fragment;
 
-        if (id == R.id.nav_camera) {
-            // Handle the camera action
-        } else if (id == R.id.nav_gallery) {
-
-        } else if (id == R.id.nav_slideshow) {
-
-        } else if (id == R.id.nav_manage) {
-
-        } else if (id == R.id.nav_share) {
-
-        } else if (id == R.id.nav_send) {
-
+        switch (id) {
+            case(R.id.nav_grocery):
+                fragment = new GroceryListFragment();
+                tag = GroceryListFragment.FTAG;
+                break;
+            case(R.id.nav_recipe):
+                fragment = new DefaultFragment();
+                tag = DefaultFragment.Companion.getFTAG();
+                break;
+            default:
+                fragment = new DefaultFragment();
+                tag = DefaultFragment.Companion.getFTAG();
+                break;
         }
+
+        getFragmentManager()
+                .beginTransaction()
+                .replace(R.id.content, fragment, tag)
+                .addToBackStack(null)
+                .commit();
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
@@ -126,4 +138,5 @@ public class MainActivity extends AppCompatActivity
     public void onListFragmentInteraction(GroceryItem item) {
         Log.d(TAG, "Interaction Detected. Item : " + item.getName());
     }
+
 }
