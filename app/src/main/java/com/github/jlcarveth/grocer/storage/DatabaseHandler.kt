@@ -5,6 +5,7 @@ import android.content.Context
 import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
+import android.util.Log
 import com.github.jlcarveth.grocer.model.GroceryEntry;
 import com.github.jlcarveth.grocer.model.GroceryItem
 
@@ -14,14 +15,19 @@ import com.github.jlcarveth.grocer.model.GroceryItem
  * The Database Handler implemented in Kotlin
  * The purpose of this class is to handle all interaction with the database,
  * so the other classes can just call a function and be done.
+ *
+ * TODO:
+ * - Change the getGroceries method so it only gets non-hidden groceries
+ * - Add a function that gets all hidden grocery entries in the DB
  */
 private val DBNAME : String = "grocer_db";
 
-private var DBVERSION : Int = 1;
-
+private var DBVERSION : Int = 2;
 
 class DatabaseHandler : SQLiteOpenHelper {
     constructor(context: Context) : super(context, DBNAME, null, DBVERSION)
+
+    private val TAG : String = "DatabaseHandler"
 
     override fun onCreate(db: SQLiteDatabase) {
         db.execSQL(GroceryEntry.SQL_CREATE_ENTRIES);
@@ -32,14 +38,58 @@ class DatabaseHandler : SQLiteOpenHelper {
         db.execSQL(GroceryEntry.SQL_CREATE_ENTRIES)
     }
 
+    /**
+     * Gets all groceries from the database that are not hidden.
+     */
     fun getGroceries() : ArrayList<GroceryItem> {
         val al = ArrayList<GroceryItem>()
         val db = this.readableDatabase
 
-        val cursor : Cursor = db.rawQuery("SELECT * FROM ${GroceryEntry.TABLE_NAME}", null)
+        //Where hidden is false (visible)
+        val cursor : Cursor = db.rawQuery("SELECT * FROM ${GroceryEntry.TABLE_NAME} " +
+                "WHERE ${GroceryEntry.COLUMN_HIDDEN} = 0", null)
 
         while (cursor.moveToNext()) {
-            val id = cursor.getString(cursor.getColumnIndexOrThrow(GroceryEntry._ID));
+            val id = cursor.getString(cursor.getColumnIndexOrThrow(GroceryEntry._ID))
+            val name = cursor.getString(cursor.getColumnIndexOrThrow(GroceryEntry.COLUMN_NAME))
+            val note = cursor.getString(cursor.getColumnIndexOrThrow(GroceryEntry.COLUMN_NOTE))
+            val qty = cursor.getString(cursor.getColumnIndexOrThrow(GroceryEntry.COLUMN_QTY))
+
+            val ci = cursor.getInt(cursor.getColumnIndexOrThrow(GroceryEntry.COLUMN_CHKD))
+            val checked : Boolean = when(ci) {
+                1 -> true
+                0 -> false
+                else -> {
+                    false
+                }
+            }
+
+            // A Visible Grocery Item
+            val g = GroceryItem(name,note,qty,checked)
+            g.id = id.toInt()
+
+            Log.d(TAG, "Item Created: $g, hidden : ${g.hidden}," +
+                    " checked : ${g.checked}, ID: ${g.id}")
+
+            al.add(g)
+        }
+
+        return al
+    }
+
+    /**
+     * Gets all hidden grocery items
+     */
+    fun getHiddenGroceryItems() : ArrayList<GroceryItem> {
+        val al = ArrayList<GroceryItem>()
+        val db = this.readableDatabase
+
+        //Where hidden is true (hidden)
+        val cursor = db.rawQuery("SELECT * FROM ${GroceryEntry.TABLE_NAME} " +
+                "WHERE ${GroceryEntry.COLUMN_HIDDEN} = 1", null)
+
+        while (cursor.moveToNext()) {
+            val id = cursor.getString(cursor.getColumnIndexOrThrow(GroceryEntry._ID))
             val name = cursor.getString(cursor.getColumnIndexOrThrow(GroceryEntry.COLUMN_NAME))
             val note = cursor.getString(cursor.getColumnIndexOrThrow(GroceryEntry.COLUMN_NOTE))
             val qty = cursor.getString(cursor.getColumnIndexOrThrow(GroceryEntry.COLUMN_QTY))
@@ -47,14 +97,68 @@ class DatabaseHandler : SQLiteOpenHelper {
             val ci = cursor.getInt(cursor.getColumnIndexOrThrow(GroceryEntry.COLUMN_CHKD))
             val checked = (ci==1)
 
+            // A Hidden Grocery Item
             val g = GroceryItem(name,note,qty,checked)
-            g.id = id.toLong()
-
+            g.hidden = true
+            g.id = id.toInt()
             al.add(g)
         }
-
         return al
     }
+
+    /**
+     * Hides the given grocery item
+     */
+    fun hideGroceryItem(g : GroceryItem) {
+        val db = this.writableDatabase
+        val values = ContentValues()
+
+        values.put(GroceryEntry.COLUMN_NAME, g.name)
+        values.put(GroceryEntry.COLUMN_NOTE, g.note)
+        values.put(GroceryEntry.COLUMN_QTY, g.qty)
+
+        val i : Int = when(g.checked) {
+            true -> 1
+            false -> 0
+        }
+
+        values.put(GroceryEntry.COLUMN_CHKD, i)
+
+        //Set hidden to true
+        values.put(GroceryEntry.COLUMN_HIDDEN, 1)
+
+        db.update(GroceryEntry.TABLE_NAME,
+                values, "${GroceryEntry._ID} = '${g.id}'", null)
+    }
+
+    /**
+     * Makes a GroceryItem visible
+     */
+    fun showGroceryItem(g : GroceryItem) {
+        val db = this.writableDatabase
+        val values = ContentValues()
+
+        values.put(GroceryEntry.COLUMN_NAME, g.name)
+        values.put(GroceryEntry.COLUMN_NOTE, g.note)
+        values.put(GroceryEntry.COLUMN_QTY, g.qty)
+
+        val i : Int = when(g.checked) {
+            true -> 1
+            false -> 0
+        }
+
+        values.put(GroceryEntry.COLUMN_CHKD, i)
+
+        //Set hidden to false
+        values.put(GroceryEntry.COLUMN_HIDDEN, 0)
+
+        db.update(GroceryEntry.TABLE_NAME,
+                values, "${GroceryEntry._ID} = '${g.id}'", null)
+    }
+
+    /**
+     * Sorts the Grocery List and removes any checked items
+     */
 
     /**
      * Removes all entries from the grocery table
@@ -81,10 +185,14 @@ class DatabaseHandler : SQLiteOpenHelper {
         }
         values.put(GroceryEntry.COLUMN_CHKD, i)
 
+        val j : Int = when (g.hidden) {
+            true -> 1
+            false -> 0
+        }
+        values.put(GroceryEntry.COLUMN_HIDDEN, j)
+
         val row : Long = db.insert(GroceryEntry.TABLE_NAME, null, values)
         dataUpdated()
-
-        g.id = row
 
         return (row > 0)
     }
@@ -92,14 +200,27 @@ class DatabaseHandler : SQLiteOpenHelper {
     /**
      * Sets the specified row's checked field to true
      */
-    fun checkGroceryItem(g : GroceryItem) {
+    fun checkGroceryItem(g : GroceryItem, bool : Boolean) {
         val db = this.writableDatabase
         val values = ContentValues()
-
+        Log.d(TAG, "Checking Item... ${g.checked}, ID: ${g.id}")
         values.put(GroceryEntry.COLUMN_NAME, g.name)
         values.put(GroceryEntry.COLUMN_NOTE, g.note)
         values.put(GroceryEntry.COLUMN_QTY, g.qty)
-        values.put(GroceryEntry.COLUMN_CHKD, true)
+
+        val i : Int = when (bool) {
+            true -> 1
+            false -> 0
+        }
+
+        values.put(GroceryEntry.COLUMN_CHKD, i)
+
+        val j : Int = when (g.hidden) {
+            true -> 1
+            false -> 0
+        }
+
+        values.put(GroceryEntry.COLUMN_HIDDEN, j)
 
         db.update(GroceryEntry.TABLE_NAME,
                 values, "${GroceryEntry._ID} = '${g.id}'", null)
