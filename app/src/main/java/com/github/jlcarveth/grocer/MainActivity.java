@@ -3,9 +3,11 @@ package com.github.jlcarveth.grocer;
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.os.Bundle;
+import android.support.design.widget.BottomSheetDialog;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -19,6 +21,7 @@ import android.view.MenuItem;
 import com.github.jlcarveth.grocer.layout.fragment.AddGroceryDialog;
 import com.github.jlcarveth.grocer.layout.fragment.DefaultFragment;
 import com.github.jlcarveth.grocer.layout.fragment.GroceryListFragment;
+import com.github.jlcarveth.grocer.layout.fragment.QuickAddDialog;
 import com.github.jlcarveth.grocer.model.GroceryItem;
 import com.github.jlcarveth.grocer.storage.DatabaseHandler;
 import com.github.jlcarveth.grocer.storage.DatabaseSubject;
@@ -45,6 +48,16 @@ public class MainActivity extends AppCompatActivity
             public void onClick(View view) {
                 AddGroceryDialog agd = new AddGroceryDialog();
                 agd.show(getFragmentManager(), "ADD_DIAG");
+            }
+        });
+
+        fab.setOnLongClickListener(new View.OnLongClickListener() {
+
+            @Override
+            public boolean onLongClick(View v) {
+                QuickAddDialog qad = new QuickAddDialog();
+                qad.show(getFragmentManager(), "QADD_DIALOG");
+                return true;
             }
         });
 
@@ -95,6 +108,8 @@ public class MainActivity extends AppCompatActivity
             return true;
         } else if (id == R.id.action_clear_all) {
             databaseHandler.clearGroceries();
+        } else if (id == R.id.action_sort) {
+            databaseHandler.sortGroceries();
         }
 
         return super.onOptionsItemSelected(item);
