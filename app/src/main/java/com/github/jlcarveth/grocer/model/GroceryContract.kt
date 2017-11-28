@@ -32,10 +32,10 @@ class GroceryEntry : BaseColumns {
 }
 
 class GroceryItem(val name : String, val note : String, val qty : String,
-                  var checked : Boolean) : Comparable<GroceryItem>{
+                  var checked : Boolean) : Comparable<GroceryItem> {
+
     var id : Int = -99
     var hidden : Boolean = false
-
 
     /**
      * Our object will need to be sorted by lists later.
@@ -43,7 +43,6 @@ class GroceryItem(val name : String, val note : String, val qty : String,
      */
     override fun compareTo(other: GroceryItem): Int = (this.name.compareTo(other.name))
 
-    override fun toString(): String = "GroceryItem{name:$name, note:$note, qty:$qty}"
-
+    override fun toString(): String = "$name"
 
 }

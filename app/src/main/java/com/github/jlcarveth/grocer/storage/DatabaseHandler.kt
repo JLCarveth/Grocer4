@@ -29,6 +29,8 @@ class DatabaseHandler : SQLiteOpenHelper {
 
     private val TAG : String = "DatabaseHandler"
 
+    private val sortType : String = "ASC"
+
     override fun onCreate(db: SQLiteDatabase) {
         db.execSQL(GroceryEntry.SQL_CREATE_ENTRIES);
     }
@@ -39,6 +41,12 @@ class DatabaseHandler : SQLiteOpenHelper {
     }
 
     /**
+     * Sorts the GroceryList
+     */
+    fun sortGroceries() {
+        hideCheckedItems()
+    }
+    /**
      * Gets all groceries from the database that are not hidden.
      */
     fun getGroceries() : ArrayList<GroceryItem> {
@@ -47,7 +55,8 @@ class DatabaseHandler : SQLiteOpenHelper {
 
         //Where hidden is false (visible)
         val cursor : Cursor = db.rawQuery("SELECT * FROM ${GroceryEntry.TABLE_NAME} " +
-                "WHERE ${GroceryEntry.COLUMN_HIDDEN} = 0", null)
+                "WHERE ${GroceryEntry.COLUMN_HIDDEN} = 0 ORDER BY " +
+                "${GroceryEntry.COLUMN_NAME} $sortType", null)
 
         while (cursor.moveToNext()) {
             val id = cursor.getString(cursor.getColumnIndexOrThrow(GroceryEntry._ID))
@@ -86,7 +95,8 @@ class DatabaseHandler : SQLiteOpenHelper {
 
         //Where hidden is true (hidden)
         val cursor = db.rawQuery("SELECT * FROM ${GroceryEntry.TABLE_NAME} " +
-                "WHERE ${GroceryEntry.COLUMN_HIDDEN} = 1", null)
+                "WHERE ${GroceryEntry.COLUMN_HIDDEN} = 1 ORDER BY " +
+                "${GroceryEntry.COLUMN_NAME} $sortType", null)
 
         while (cursor.moveToNext()) {
             val id = cursor.getString(cursor.getColumnIndexOrThrow(GroceryEntry._ID))
@@ -153,12 +163,14 @@ class DatabaseHandler : SQLiteOpenHelper {
         values.put(GroceryEntry.COLUMN_HIDDEN, 0)
 
         db.update(GroceryEntry.TABLE_NAME,
-                values, "${GroceryEntry._ID} = '${g.id}'", null)
+                values, "${GroceryEntry.COLUMN_NAME} = '${g.name}' " +
+                "AND ${GroceryEntry.COLUMN_HIDDEN} = 1", null)
+        dataUpdated()
     }
 
-    /**
-     * Sorts the Grocery List and removes any checked items
-     */
+    fun showGroceryItem(s : String) {
+        showGroceryItem(GroceryItem(s, "","",false))
+    }
 
     /**
      * Removes all entries from the grocery table
@@ -227,6 +239,21 @@ class DatabaseHandler : SQLiteOpenHelper {
     }
 
     /**
+     * Sets all checked entries to hidden
+     */
+    fun hideCheckedItems() {
+        val db = this.writableDatabase
+        val values = ContentValues()
+
+        values.put(GroceryEntry.COLUMN_HIDDEN, 1)
+
+        db.update(GroceryEntry.TABLE_NAME, values,
+                "${GroceryEntry.COLUMN_CHKD} = 1", null)
+
+        dataUpdated()
+    }
+
+    /**
      * Removes one item from the database
      */
     fun deleteGroceryItem(g : GroceryItem) : Boolean {
@@ -245,4 +272,5 @@ class DatabaseHandler : SQLiteOpenHelper {
         DatabaseSubject.notifyObservers()
         close()
     }
+
 }

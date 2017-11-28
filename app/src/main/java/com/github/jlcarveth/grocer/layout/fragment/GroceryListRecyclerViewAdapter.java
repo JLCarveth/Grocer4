@@ -94,7 +94,7 @@ public class GroceryListRecyclerViewAdapter extends RecyclerView.Adapter<Grocery
 
     @Override
     public void onItemDismiss(int position) {
-        dh.deleteGroceryItem(mValues.get(position));
+        dh.deleteGroceryItem(mValues.get(position)); //Perhaps not needed? Testing should be done.
         mValues.clear();
         mValues.addAll(dh.getGroceries());
         //notifyItemRemoved(position);
