@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+    <PreferenceCategory
+        android:title="@string/general_settings">
+        <CheckBoxPreference
+            android:key="pref_remove_on_sort"
+            android:title="Remove Checked Items When Sorting"
+            android:summary="@string/pref_summary_sort_check"
+            android:defaultValue="true"/>
+        <Preference
+            android:key="pref_clear_hidden"
+            android:title="Clear Hidden Items"
+            android:summary="Helps to save memory by removing hidden grocery items."/>
+    </PreferenceCategory>
+
+</PreferenceScreen>

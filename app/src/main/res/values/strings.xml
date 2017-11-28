@@ -26,4 +26,6 @@
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="coming_soon">Coming Soon!</string>
     <string name="sort">Sort</string>
+    <string name="general_settings">General Settings</string>
+    <string name="pref_summary_sort_check">When true, the app will delete any checked groceries whenever a sort is performed.</string>
 </resources>

@@ -22,6 +22,7 @@ import com.github.jlcarveth.grocer.layout.fragment.AddGroceryDialog;
 import com.github.jlcarveth.grocer.layout.fragment.DefaultFragment;
 import com.github.jlcarveth.grocer.layout.fragment.GroceryListFragment;
 import com.github.jlcarveth.grocer.layout.fragment.QuickAddDialog;
+import com.github.jlcarveth.grocer.layout.fragment.SettingsFragment;
 import com.github.jlcarveth.grocer.model.GroceryItem;
 import com.github.jlcarveth.grocer.storage.DatabaseHandler;
 import com.github.jlcarveth.grocer.storage.DatabaseSubject;
@@ -105,7 +106,10 @@ public class MainActivity extends AppCompatActivity
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
-            return true;
+            getFragmentManager()
+                    .beginTransaction()
+                    .replace(R.id.content, new SettingsFragment(), "SETTINGS")
+                    .addToBackStack(null).commit();
         } else if (id == R.id.action_clear_all) {
             databaseHandler.clearGroceries();
         } else if (id == R.id.action_sort) {
