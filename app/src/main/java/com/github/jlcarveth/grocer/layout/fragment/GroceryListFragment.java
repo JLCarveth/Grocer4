@@ -8,7 +8,6 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -35,7 +34,6 @@ import java.util.ArrayList;
  */
 public class GroceryListFragment extends Fragment implements OnStartDragListener, DatabaseObserver {
 
-    private static final String TAG = "GLFragment";
     /**
      * For Fragment tagging
      */
@@ -139,18 +137,15 @@ public class GroceryListFragment extends Fragment implements OnStartDragListener
     public void update() {
         dataset.clear();
         dataset.addAll(dh.getGroceries());
+        adapter.notifyDataSetChanged();
 
         if (dataset.isEmpty()){
-            Log.d(TAG, "Dataset Empty");
             rv.setVisibility(View.GONE);
             emptyView.setVisibility(View.VISIBLE);
         } else {
-            Log.d(TAG, "Dataset Not Empty");
             rv.setVisibility(View.VISIBLE);
             emptyView.setVisibility(View.GONE);
         }
-
-        adapter.notifyDataSetChanged();
     }
 
     /**
