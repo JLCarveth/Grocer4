@@ -10,13 +10,15 @@
         android:layout_height="wrap_content"
         android:layout_gravity="start"
         android:layout_weight="5"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:layout_margin="10dp">
 
         <TextView
             android:id="@+id/gl_name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_margin="@dimen/text_margin"
+            android:layout_marginStart="@dimen/text_margin"
+            android:layout_marginVertical="10dp"
             android:text="Name"
             android:textAppearance="@style/TextAppearance.AppCompat.Large"
             android:textColor="@color/colorText"/>
@@ -25,8 +27,17 @@
             android:id="@+id/gl_note"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_margin="@dimen/text_margin"
+            android:layout_marginStart="@dimen/text_margin"
             android:text="Note"
+            android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+            android:textColor="@color/colorTextSecondary"/>
+
+        <TextView
+            android:id="@+id/gl_qty"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/text_margin"
+            android:text="Quantity"
             android:textAppearance="@style/TextAppearance.AppCompat.Medium"
             android:textColor="@color/colorTextSecondary"/>
     </LinearLayout>
@@ -35,7 +46,7 @@
         android:id="@+id/gl_empty_space"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
-        android:layout_weight="2"></Space>
+        android:layout_weight="2"/>
 
     <LinearLayout
         android:layout_width="wrap_content"

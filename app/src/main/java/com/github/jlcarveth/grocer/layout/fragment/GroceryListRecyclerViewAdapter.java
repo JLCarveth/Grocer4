@@ -64,8 +64,9 @@ public class GroceryListRecyclerViewAdapter extends RecyclerView.Adapter<Grocery
         GroceryItem item = mValues.get(position);
         System.out.println("onBindViewHolder pos: " + position);
         holder.mNameView.setText(item.getName());
-        holder.mNoteView.setText(item.getNote());
+        holder.mNoteView.setText("Note: " + item.getNote());
         holder.mCheckbox.setChecked(item.getChecked());
+        holder.qtyView.setText("Quantity: " + item.getQty());
 
 
         holder.mDragBars.setOnTouchListener(new View.OnTouchListener() {
@@ -111,6 +112,8 @@ public class GroceryListRecyclerViewAdapter extends RecyclerView.Adapter<Grocery
 
         public final ImageView mDragBars;
 
+        public final TextView qtyView;
+
         public GroceryItem mItem;
 
 
@@ -122,6 +125,7 @@ public class GroceryListRecyclerViewAdapter extends RecyclerView.Adapter<Grocery
             mNoteView = (TextView) view.findViewById(R.id.gl_note);
             mCheckbox = (CheckBox) view.findViewById(R.id.gl_checkbox);
             mDragBars = (ImageView) view.findViewById(R.id.gl_burger);
+            qtyView = (TextView) view.findViewById(R.id.gl_qty);
 
             mCheckbox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
                 @Override
