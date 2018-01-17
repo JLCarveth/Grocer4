@@ -5,8 +5,7 @@ import android.content.Context
 import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
-import com.github.jlcarveth.grocer.model.GroceryEntry;
-import com.github.jlcarveth.grocer.model.GroceryItem
+import com.github.jlcarveth.grocer.model.*
 
 /**
  * Created by John on 11/10/2017.
@@ -107,6 +106,8 @@ class DatabaseHandler : SQLiteOpenHelper {
 
     /**
      * Removes one item from the database
+     * Well technically it would delete any of the groceries with the same name...
+     * TODO: Fix that
      */
     fun deleteGroceryItem(g : GroceryItem) : Boolean {
         val db = this.writableDatabase
@@ -115,6 +116,130 @@ class DatabaseHandler : SQLiteOpenHelper {
                 "${GroceryEntry.COLUMN_NAME}='${g.name}'", null)
         dataUpdated()
         return (row > 0)
+    }
+
+    /**
+     * Get all recipes stored in the database
+     * @return an arrayliist of all recipes
+     */
+    fun getRecipes() : ArrayList<RecipeItem> {
+        val al = ArrayList<RecipeItem>()
+        val db = this.readableDatabase
+
+        val cursor = db.rawQuery("SELECT * FROM ${RecipeContract.TABLE_NAME}", null)
+
+        while (cursor.moveToNext()) {
+            val id = cursor.getInt(cursor.getColumnIndexOrThrow(RecipeContract._ID))
+            val name = cursor.getString(cursor.getColumnIndexOrThrow(RecipeContract.COLUMN_NAME))
+            val ingStr = cursor.getString(cursor.getColumnIndexOrThrow(RecipeContract.COLUMN_ING))
+            val dirStr = cursor.getString(cursor.getColumnIndexOrThrow(RecipeContract.COLUMN_DIR))
+            val prep = cursor.getInt(cursor.getColumnIndexOrThrow(RecipeContract.COLUMN_PREP))
+            val cook = cursor.getInt(cursor.getColumnIndexOrThrow(RecipeContract.COLUMN_COOK))
+            val tagStr = cursor.getString(cursor.getColumnIndexOrThrow(RecipeContract.COLUMN_TAGS))
+            val rating = cursor.getInt(cursor.getColumnIndexOrThrow(RecipeContract.COLUMN_RATING))
+            val notes = cursor.getString(cursor.getColumnIndexOrThrow(RecipeContract.COLUMN_NOTES))
+
+            // Ingredients are stored as one string separated by commas in the DB
+            val ingredients = ingStr.split(",").toTypedArray()
+            // Same as ingredients.
+            val directions = dirStr.split(",").toTypedArray()
+            // Stored as minutes in the database (Int)
+            val prepTime = MinuteTime(prep)
+            val cookTime = MinuteTime(cook)
+            // Same as ingredients, directions
+            val tags = tagStr.split(",").toTypedArray()
+
+            val item = RecipeItem(name, ingredients, directions, prepTime, cookTime, tags, notes)
+
+            if (rating in 0..5) {
+                item.rating = rating
+            }
+
+            item.id = id
+
+            al.add(item)
+        }
+        return al
+    }
+
+    /**
+     * Inserts the recipe to the database
+     * @param item The Recipe to add to the database
+     * @return the ID of the new entry, or -99 if it wasn't added.
+     */
+    fun insertRecipe(item : RecipeItem) : Long {
+        val db = this.writableDatabase
+        val values = ContentValues()
+
+        //Prepare some values
+        val ingredients = item.ingredients.joinToString(",")
+        println(ingredients)
+        val directions = item.directions.joinToString(",")
+        val tags = item.tags.joinToString(",")
+
+        val prep = item.prepTime.getTimeInMinutes()
+        val cook = item.cookTime.getTimeInMinutes()
+
+        values.put(RecipeContract.COLUMN_NAME, item.name)
+        values.put(RecipeContract.COLUMN_ING, ingredients)
+        values.put(RecipeContract.COLUMN_DIR, directions)
+        values.put(RecipeContract.COLUMN_PREP, prep)
+        values.put(RecipeContract.COLUMN_COOK, cook)
+        values.put(RecipeContract.COLUMN_TAGS, tags)
+        values.put(RecipeContract.COLUMN_NOTES, item.notes)
+        values.put(RecipeContract.COLUMN_RATING, item.rating)
+
+        val row : Long = db.insert(RecipeContract.TABLE_NAME, null, values)
+
+        dataUpdated()
+        return row
+    }
+
+    /**
+     * Deletes the given recipe from the database
+     * @param item the Recipe to delete. Object must have a non-default ID
+     * @return true a row was changed because of this function call.
+     */
+    fun deleteRecipe(item : RecipeItem) : Boolean {
+        val db = this.writableDatabase
+
+        val row = db.delete(RecipeContract.TABLE_NAME,
+                "${RecipeContract._ID}='${item.id}'", null)
+        dataUpdated()
+        return (row > 0)
+    }
+
+    /**
+     * If the recipe ID exists in the database, the corresponding row is updated
+     * @param item the Recipe to update. The Recipe object must have had an ID set.
+     * @return true if the row was updated, false #rows changed != 1
+     */
+    fun updateRecipe(item : RecipeItem) : Boolean {
+        val db = writableDatabase
+        val values = ContentValues()
+
+        //Prepare some values
+        val ingredients = item.ingredients.joinToString(",")
+        println(ingredients)
+        val directions = item.directions.joinToString(",")
+        val tags = item.tags.joinToString(",")
+
+        val prep = item.prepTime.getTimeInMinutes()
+        val cook = item.cookTime.getTimeInMinutes()
+
+        values.put(RecipeContract.COLUMN_NAME, item.name)
+        values.put(RecipeContract.COLUMN_ING, ingredients)
+        values.put(RecipeContract.COLUMN_DIR, directions)
+        values.put(RecipeContract.COLUMN_PREP, prep)
+        values.put(RecipeContract.COLUMN_COOK, cook)
+        values.put(RecipeContract.COLUMN_TAGS, tags)
+        values.put(RecipeContract.COLUMN_NOTES, item.notes)
+        values.put(RecipeContract.COLUMN_RATING, item.rating)
+
+        val rows = db.update(RecipeContract.TABLE_NAME,
+                values, "${RecipeContract._ID} = '${item.id}'", null)
+        dataUpdated()
+        return (rows == 1)
     }
 
     /**
