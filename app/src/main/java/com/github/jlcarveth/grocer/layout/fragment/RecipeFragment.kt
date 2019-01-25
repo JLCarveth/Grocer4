@@ -23,8 +23,6 @@ import com.github.jlcarveth.grocer.util.recycler.OnStartDragListener
  */
 class RecipeFragment : Fragment(), DatabaseObserver {
 
-    val TAG = "RecipeFragment"
-
     lateinit var rv : RecyclerView
     lateinit var adapter : RecipeAdapter
     lateinit var dataset : ArrayList<RecipeItem>
@@ -77,5 +75,7 @@ class RecipeFragment : Fragment(), DatabaseObserver {
             //fragment.arguments...
             return fragment
         }
+
+        val TAG = "RecipeFragment"
     }
 }

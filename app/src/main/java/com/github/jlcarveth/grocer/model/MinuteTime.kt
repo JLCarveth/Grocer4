@@ -62,4 +62,11 @@ class MinuteTime(private val minutes : Int) {
             return "${this.getHours()}h ${this.getMinutes()}m"
         }
     }
+
+    /**
+     * Interface to be implemented by Objects that can create MinuteTime objects
+     */
+    interface MinuteTimeProvider {
+        fun provide(time : MinuteTime)
+    }
 }

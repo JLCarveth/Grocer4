@@ -23,8 +23,6 @@ class AddGroceryDialog : DialogFragment() {
 
     private lateinit var dataHandler : DatabaseHandler
 
-    private val TAG = "AddGroceryDialog"
-
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         val inflater : LayoutInflater = activity.layoutInflater
         val view = inflater.inflate(R.layout.fragment_add_dialog, null)
@@ -43,7 +41,7 @@ class AddGroceryDialog : DialogFragment() {
 
         builder.setMessage(message)
         builder.setPositiveButton(R.string.add) { dialog, id ->
-            Log.d(TAG, "Add Item")
+            Log.d(Companion.TAG, "Add Item")
             if (InputValidator.validateField(nameInput,
                     InputValidator.ValidationType.NON_EMPTY)) {
                 val name = nameInput.text.toString()
@@ -57,11 +55,15 @@ class AddGroceryDialog : DialogFragment() {
         builder.setNegativeButton(R.string.cancel, object: DialogInterface.OnClickListener {
             override fun onClick(dialog : DialogInterface, id : Int) {
                 dialog.dismiss()
-                Log.d(TAG, "Negative Action")
+                Log.d(Companion.TAG, "Negative Action")
             }
         })
 
         return builder.create()
 
+    }
+
+    companion object {
+        val TAG = "AddGroceryDialog"
     }
 }

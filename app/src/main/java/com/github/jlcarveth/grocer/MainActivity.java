@@ -1,10 +1,8 @@
 package com.github.jlcarveth.grocer;
 
 import android.app.Fragment;
-import android.app.FragmentManager;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.util.Log;
 import android.view.View;
 import android.support.design.widget.NavigationView;
@@ -17,15 +15,15 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 import com.github.jlcarveth.grocer.layout.fragment.AddGroceryDialog;
+import com.github.jlcarveth.grocer.layout.fragment.AddRecipeFragment;
 import com.github.jlcarveth.grocer.layout.fragment.DefaultFragment;
 import com.github.jlcarveth.grocer.layout.fragment.GroceryListFragment;
+import com.github.jlcarveth.grocer.layout.fragment.RecipeFragment;
 import com.github.jlcarveth.grocer.model.GroceryItem;
 import com.github.jlcarveth.grocer.storage.DatabaseHandler;
-import com.github.jlcarveth.grocer.storage.DatabaseSubject;
 
 public class MainActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener,
-        GroceryListFragment.OnListFragmentInteractionListener {
+        implements NavigationView.OnNavigationItemSelectedListener {
 
     private static final String TAG = "GrocerMainActivity";
     private DatabaseHandler databaseHandler;
@@ -43,8 +41,22 @@ public class MainActivity extends AppCompatActivity
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                AddGroceryDialog agd = new AddGroceryDialog();
-                agd.show(getFragmentManager(), "ADD_DIAG");
+                Fragment fragment = getFragmentManager().findFragmentByTag(GroceryListFragment.TAG);
+                if (fragment != null && fragment.isVisible()) {
+                    AddGroceryDialog agd = new AddGroceryDialog();
+                    agd.show(getFragmentManager(), AddGroceryDialog.Companion.getTAG());
+                }
+                Log.d(TAG, "FAB Listener");
+                fragment = getFragmentManager().findFragmentByTag(RecipeFragment.Companion.getTAG());
+                if (fragment != null && fragment.isVisible()) {
+
+                    AddRecipeFragment arf = new AddRecipeFragment();
+                    getFragmentManager().beginTransaction()
+                            .replace(R.id.content, arf, AddRecipeFragment.Companion.getTAG())
+                            .addToBackStack(null)
+                            .commit();
+                }
+
             }
         });
 
@@ -59,7 +71,7 @@ public class MainActivity extends AppCompatActivity
 
         GroceryListFragment fragment = new GroceryListFragment();
         getFragmentManager().beginTransaction()
-                .replace(R.id.content, fragment, fragment.FTAG)
+                .replace(R.id.content, fragment, fragment.TAG)
                 .addToBackStack(null)
                 .commit();
 
@@ -95,6 +107,8 @@ public class MainActivity extends AppCompatActivity
             return true;
         } else if (id == R.id.action_clear_all) {
             databaseHandler.clearGroceries();
+        } else if (id == R.id.action_sort) {
+            databaseHandler.sortGroceries();
         }
 
         return super.onOptionsItemSelected(item);
@@ -111,15 +125,15 @@ public class MainActivity extends AppCompatActivity
         switch (id) {
             case(R.id.nav_grocery):
                 fragment = new GroceryListFragment();
-                tag = GroceryListFragment.FTAG;
+                tag = GroceryListFragment.TAG;
                 break;
             case(R.id.nav_recipe):
-                fragment = new DefaultFragment();
-                tag = DefaultFragment.Companion.getFTAG();
+                fragment = new RecipeFragment();
+                tag = RecipeFragment.Companion.getTAG();
                 break;
             default:
                 fragment = new DefaultFragment();
-                tag = DefaultFragment.Companion.getFTAG();
+                tag = DefaultFragment.Companion.getTAG();
                 break;
         }
 
@@ -134,9 +148,5 @@ public class MainActivity extends AppCompatActivity
         return true;
     }
 
-    @Override
-    public void onListFragmentInteraction(GroceryItem item) {
-        Log.d(TAG, "Interaction Detected. Item : " + item.getName());
-    }
 
 }

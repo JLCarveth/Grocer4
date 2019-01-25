@@ -139,14 +139,14 @@ public class GroceryListRecyclerViewAdapter extends RecyclerView.Adapter<Grocery
             mCheckbox = (CheckBox) view.findViewById(R.id.gl_checkbox);
             mDragBars = (ImageView) view.findViewById(R.id.gl_burger);
 
-            /**mCheckbox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            mCheckbox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
                 @Override
                 public void onCheckedChanged(CompoundButton compoundButton, boolean isChecked) {
                     // Change the value in the list
                     mValues.get(getAdapterPosition()).setChecked(isChecked);
-                    //dh.checkEntry(mValues.get(getAdapterPosition()));
+                    dh.checkGroceryItem(mValues.get(getAdapterPosition()));
                 }
-            });*/
+            });
 
             mView.setOnLongClickListener(new View.OnLongClickListener() {
                 @Override

@@ -1,14 +1,17 @@
 package com.github.jlcarveth.grocer.layout.fragment
 
-import android.content.Context
-import android.net.Uri
+import android.app.Fragment
 import android.os.Bundle
-import android.support.v4.app.Fragment
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-
+import android.widget.Button
+import android.widget.EditText
+import android.widget.TextView
 import com.github.jlcarveth.grocer.R
+import com.github.jlcarveth.grocer.model.MinuteTime
+import com.github.jlcarveth.grocer.util.ViewGroupUtil
 
 /**
  * A simple [Fragment] subclass.
@@ -20,83 +23,179 @@ import com.github.jlcarveth.grocer.R
  */
 class AddRecipeFragment : Fragment() {
 
-    // TODO: Rename and change types of parameters
-    private var mParam1: String? = null
-    private var mParam2: String? = null
+    lateinit var nameField : EditText
+    lateinit var ingredientBtn : Button
+    lateinit var directionBtn : Button
+    lateinit var prepBtn : Button
+    lateinit var cookBtn : Button
+    lateinit var tagBtn : Button
+    lateinit var noteField : EditText
 
-    private var mListener: OnFragmentInteractionListener? = null
+    val ingredients = ArrayList<String>()
+    val directions = ArrayList<String>()
+    val tags = ArrayList<String>()
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        if (arguments != null) {
-            mParam1 = arguments.getString(ARG_PARAM1)
-            mParam2 = arguments.getString(ARG_PARAM2)
-        }
-    }
+    lateinit var prepTime : MinuteTime
+    lateinit var cookTime : MinuteTime
 
-    override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?,
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
         // Inflate the layout for this fragment
-        return inflater!!.inflate(R.layout.fragment_add_recipe, container, false)
-    }
+        val view = inflater.inflate(R.layout.fragment_add_recipe, container, false)
 
-    // TODO: Rename method, update argument and hook method into UI event
-    fun onButtonPressed(uri: Uri) {
-        if (mListener != null) {
-            mListener!!.onFragmentInteraction(uri)
+        nameField = view.findViewById(R.id.dar_name)
+        ingredientBtn = view.findViewById(R.id.dar_ingredients)
+        directionBtn = view.findViewById(R.id.dar_directions)
+        prepBtn = view.findViewById(R.id.dar_prep)
+        cookBtn = view.findViewById(R.id.dar_cook)
+        tagBtn = view.findViewById(R.id.dar_tags)
+        noteField = view.findViewById(R.id.dar_notes)
+
+        ingredientBtn.setOnClickListener {
+            val led = ListEntryDialog()
+            val args = Bundle()
+            args.putString("title", "Ingredients")
+            args.putString("message", "Input your ingredients:")
+
+            led.arguments = args
+            led.listable = object : Listable<String> {
+                override fun list(data: MutableList<String>) {
+                    ingredients.addAll(data)
+
+                    // We know the dialog has been OKed
+                    val tv = TextView(activity)
+                    if (data.count() > 2) {
+                        tv.text = "Indredients: ${data[0]}, ${data[1]}, ${data[2]}, ..."
+
+                    } else {
+                        tv.text = "Ingredients: " + data.joinToString()
+                    }
+                    ViewGroupUtil.replaceView(ingredientBtn, tv)
+                }
+            }
+            led.show(fragmentManager, TAG)
         }
-    }
 
-    override fun onAttach(context: Context?) {
-        super.onAttach(context)
-        if (context is OnFragmentInteractionListener) {
-            mListener = context
-        } else {
-            throw RuntimeException(context!!.toString() + " must implement OnFragmentInteractionListener")
+        directionBtn.setOnClickListener {
+            val led = ListEntryDialog()
+            val args = Bundle()
+            args.putString("title", "Directions")
+            args.putString("message", "Input your directions:")
+
+            led.arguments = args
+
+            led.listable = object : Listable<String> {
+                override fun list(data: MutableList<String>) {
+                    directions.addAll(data)
+
+                    // Same as before!
+                    val tv = TextView(activity)
+                    if (data.count() > 2) {
+                        tv.text = "Directions: ${data[0]}, ${data[1]}, ${data[2]}, ..."
+
+                    } else {
+                        tv.text = "Directions: " + data.joinToString()
+                    }
+                    ViewGroupUtil.replaceView(directionBtn, tv)
+                }
+            }
+            led.show(fragmentManager, TAG)
         }
+
+        prepBtn.setOnClickListener {
+            val mtpd = MinuteTimePickerDialog()
+
+            val args = Bundle()
+            args.putInt("mode", MinuteTimePickerDialog.MINUTE)
+
+            mtpd.arguments = args
+            mtpd.provider = object : MinuteTime.MinuteTimeProvider {
+                override fun provide(time: MinuteTime) {
+                    prepTime = time
+                    Log.i(TAG, "Provider called.")
+
+                    // Still the same concept. The provide method is only called when the dialog OKs
+                    val tv = TextView(activity)
+                    tv.text = time.toString()
+
+                    ViewGroupUtil.replaceView(prepBtn, tv)
+                }
+            }
+
+            mtpd.show(fragmentManager, MinuteTimePickerDialog.TAG)
+        }
+
+        cookBtn.setOnClickListener {
+            val mptd = MinuteTimePickerDialog()
+
+            val args = Bundle()
+            args.putInt("mode", MinuteTimePickerDialog.HOUR_AND_MINUTE)
+
+            mptd.arguments = args
+            mptd.provider = object : MinuteTime.MinuteTimeProvider {
+                override fun provide(time: MinuteTime) {
+                    cookTime = time
+                    Log.i(TAG, "Provider called.")
+
+                    // Still the same concept. The provide method is only called when the dialog OKs
+                    val tv = TextView(activity)
+                    tv.text = time.toString()
+
+                    ViewGroupUtil.replaceView(cookBtn, tv)
+                }
+
+            }
+
+            mptd.show(fragmentManager, MinuteTimePickerDialog.TAG)
+        }
+
+        tagBtn.setOnClickListener {
+            val led = ListEntryDialog()
+            val args = Bundle()
+            args.putString("title", "Tags")
+            args.putString("message", "Add tags to this recipe:")
+
+            led.arguments = args
+
+            led.listable = object : Listable<String> {
+                override fun list(data: MutableList<String>) {
+                    tags.addAll(data)
+
+                    // Same as before!
+                    val tv = TextView(activity)
+                    if (data.count() > 2) {
+                        tv.text = "Tags: ${data[0]}, ${data[1]}, ${data[2]}, ..."
+
+                    } else {
+                        tv.text = "Tags: " + data.joinToString()
+                    }
+                    ViewGroupUtil.replaceView(tagBtn, tv)
+                }
+            }
+
+            led.show(fragmentManager, TAG)
+        }
+
+        return view
     }
 
-    override fun onDetach() {
-        super.onDetach()
-        mListener = null
-    }
-
-    /**
-     * This interface must be implemented by activities that contain this
-     * fragment to allow an interaction in this fragment to be communicated
-     * to the activity and potentially other fragments contained in that
-     * activity.
-     *
-     *
-     * See the Android Training lesson [Communicating with Other Fragments](http://developer.android.com/training/basics/fragments/communicating.html) for more information.
-     */
-    interface OnFragmentInteractionListener {
-        // TODO: Update argument type and name
-        fun onFragmentInteraction(uri: Uri)
-    }
 
     companion object {
-        // TODO: Rename parameter arguments, choose names that match
-        // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-        private val ARG_PARAM1 = "param1"
-        private val ARG_PARAM2 = "param2"
 
         /**
          * Use this factory method to create a new instance of
          * this fragment using the provided parameters.
          *
-         * @param param1 Parameter 1.
-         * @param param2 Parameter 2.
          * @return A new instance of fragment AddRecipeFragment.
          */
-        // TODO: Rename and change types and number of parameters
-        fun newInstance(param1: String, param2: String): AddRecipeFragment {
+        fun newInstance(): AddRecipeFragment {
             val fragment = AddRecipeFragment()
             val args = Bundle()
-            args.putString(ARG_PARAM1, param1)
-            args.putString(ARG_PARAM2, param2)
+
             fragment.arguments = args
             return fragment
         }
+
+        val TAG = "AddRecipe"
     }
-}// Required empty public constructor
+}

@@ -13,6 +13,7 @@
         <EditText
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:id="@+id/dar_name"
             android:hint="@string/recipe_name"
             android:inputType="textCapWords"/>
 
@@ -59,14 +60,19 @@
             android:layout_height="wrap_content"
             android:id="@+id/dar_notes"
             android:hint="@string/notes"/>
-
-        <Button
+        <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:id="@+id/dar_create"
-            android:text="Create"
-            android:background="@color/colorPrimaryDark"
-            android:textColor="#FFF"/>
+            android:layout_height="wrap_content">
+            <Button
+                android:id="@+id/dar_create"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentBottom="true"
+                android:background="@color/colorPrimaryDark"
+                android:text="Create"
+                android:textColor="#FFF" />
+        </RelativeLayout>
+
 
     </LinearLayout>
 

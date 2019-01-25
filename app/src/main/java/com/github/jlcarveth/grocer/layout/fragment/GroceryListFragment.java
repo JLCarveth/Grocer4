@@ -37,7 +37,7 @@ public class GroceryListFragment extends Fragment implements OnStartDragListener
     /**
      * For Fragment tagging
      */
-    public static final String FTAG = "GROCERY";
+    public static final String TAG = "GROCERY";
 
     private OnListFragmentInteractionListener mListener;
 
@@ -106,12 +106,6 @@ public class GroceryListFragment extends Fragment implements OnStartDragListener
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        if (context instanceof OnListFragmentInteractionListener) {
-            mListener = (OnListFragmentInteractionListener) context;
-        } else {
-            throw new RuntimeException(context.toString()
-                    + " must implement OnListFragmentInteractionListener");
-        }
 
         DatabaseSubject.Companion.attach(this);
     }

@@ -15,10 +15,12 @@ class GroceryEntry : BaseColumns {
         val COLUMN_NOTE = "note"
         val COLUMN_QTY = "qty"
         val COLUMN_CHKD = "checked"
+        val COLUMN_HIDDEN = "hidden"
 
         val SQL_CREATE_ENTRIES = "CREATE TABLE $TABLE_NAME (" +
                 "$_ID INTEGER PRIMARY KEY," +
-                "$COLUMN_NAME TEXT, $COLUMN_NOTE TEXT, $COLUMN_QTY TEXT, $COLUMN_CHKD INTEGER)"
+                "$COLUMN_NAME TEXT, $COLUMN_NOTE TEXT, $COLUMN_QTY TEXT, $COLUMN_CHKD INTEGER," +
+                "$COLUMN_HIDDEN INTEGER)"
 
         val SQL_DELETE_ENTRIES = "DROP TABLE IF EXISTS $TABLE_NAME"
     }

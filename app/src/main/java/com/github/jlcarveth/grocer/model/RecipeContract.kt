@@ -27,7 +27,7 @@ class RecipeContract : BaseColumns {
                 "$_ID INTEGER PRIMARY KEY," +
                 "$COLUMN_NAME TEXT, $COLUMN_ING TEXT, $COLUMN_DIR TEXT," +
                 "$COLUMN_PREP INTEGER, $COLUMN_COOK INTEGER, $COLUMN_TAGS TEXT," +
-                "$COLUMN_NOTES TEXT, $COLUMN_RATING INTEGER"
+                "$COLUMN_NOTES TEXT, $COLUMN_RATING INTEGER)"
 
         val SQL_DELETE_ENTRIES = "DROP TABLE IF EXISTS $TABLE_NAME"
     }
