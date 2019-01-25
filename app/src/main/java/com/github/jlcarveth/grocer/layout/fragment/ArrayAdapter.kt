@@ -1,26 +1,18 @@
 package com.github.jlcarveth.grocer.layout.fragment
 
-import android.content.Context
 import android.support.v7.widget.RecyclerView
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
-import com.github.jlcarveth.grocer.model.GroceryItem
-import com.github.jlcarveth.grocer.storage.DatabaseHandler
 
 /**
- * Created by John on 11/27/2017.
+ * Created by John on 1/17/2018.
  *
- * An ArrayAdapter implementation for RecyclerView
+ * Simple Array Adapter that displays a list of Objects by their toString() values.
+ * Good for quick simple lists.
  */
-class ArrayAdapter<E>(val data: ArrayList<E>, c: Context) : RecyclerView.Adapter<ArrayAdapter.ViewHolder>() {
-    private val TAG = "ArrayAdapter"
-
-    private var dh : DatabaseHandler = DatabaseHandler(c)
-
-    override fun getItemCount(): Int = data.count()
+class ArrayAdapter<E>(val data : ArrayList<E>) : RecyclerView.Adapter<ArrayAdapter.ViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup?, viewType: Int): ViewHolder {
         val view = LayoutInflater.from(parent?.context)
@@ -32,17 +24,13 @@ class ArrayAdapter<E>(val data: ArrayList<E>, c: Context) : RecyclerView.Adapter
         if (holder == null) return
 
         holder.bind(data[position].toString())
-        holder.itemView.setOnClickListener(object : View.OnClickListener {
-            override fun onClick(v: View?) {
-                val g  = data[position];
-                dh.showGroceryItem(g.toString())
-                Closable.closeObservers()
-            }
-        })
     }
 
+    override fun getItemCount(): Int {
+        return data.count()
+    }
 
-    class ViewHolder(itemView: View?) : RecyclerView.ViewHolder(itemView) {
+    class ViewHolder(view : View) : RecyclerView.ViewHolder(view) {
         // The ID from the Android layout file
         val textView = itemView?.findViewById<TextView>(android.R.id.text1)
 
@@ -51,26 +39,3 @@ class ArrayAdapter<E>(val data: ArrayList<E>, c: Context) : RecyclerView.Adapter
         }
     }
 }
-
-interface Closable {
-    fun close()
-
-    companion object {
-        val observers = ArrayList<Closable>()
-
-        fun attatch(observer : Closable) {
-            observers.add(observer)
-        }
-
-        fun detach(observer : Closable) {
-            observers.remove(observer)
-        }
-
-        fun closeObservers() {
-            for (i in observers) {
-                i.close()
-            }
-        }
-    }
-}
-

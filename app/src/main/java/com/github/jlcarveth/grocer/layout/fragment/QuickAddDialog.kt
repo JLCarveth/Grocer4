@@ -3,12 +3,9 @@ package com.github.jlcarveth.grocer.layout.fragment
 import android.app.AlertDialog
 import android.app.Dialog
 import android.app.DialogFragment
-import android.content.DialogInterface
 import android.graphics.drawable.Drawable
 import android.os.Bundle
-import android.support.design.widget.BottomSheetDialogFragment
 import android.support.v4.content.ContextCompat
-import android.support.v7.widget.DividerItemDecoration
 import android.support.v7.widget.RecyclerView
 import android.util.Log
 import android.view.LayoutInflater
@@ -20,7 +17,7 @@ import com.github.jlcarveth.grocer.storage.DatabaseHandler
 /**
  * Created by John on 11/26/2017.
  */
-class QuickAddDialog : DialogFragment(), Closable {
+class QuickAddDialog : DialogFragment() {
 
     private lateinit var dataHandler : DatabaseHandler
 
@@ -38,8 +35,7 @@ class QuickAddDialog : DialogFragment(), Closable {
 
         val dataset = dataHandler.getHiddenGroceryItems()
 
-        Closable.attatch(this)
-        adapter = ArrayAdapter(dataset, activity.applicationContext)
+        adapter = ArrayAdapter<GroceryItem>(dataset)
         rv.adapter = adapter
         rv.addItemDecoration(div)
 
@@ -58,8 +54,5 @@ class QuickAddDialog : DialogFragment(), Closable {
         return builder.create()
     }
 
-    override fun close() {
-        this.dismiss()
-    }
 
 }

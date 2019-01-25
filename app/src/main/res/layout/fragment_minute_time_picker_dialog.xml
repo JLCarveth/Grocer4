@@ -1,0 +1,62 @@
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:id="@+id/mtpd_table"
+    tools:context="com.github.jlcarveth.grocer.layout.fragment.MinuteTimePickerDialog">
+
+    <TableLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+        <TableRow
+            android:gravity="center">
+            <TextView
+                android:layout_height="wrap_content"
+                android:layout_width="wrap_content"
+                android:id="@+id/mtpd_hourTitle"
+                android:text="@string/hours"
+                android:padding="10dp"
+                android:gravity="center"/>
+            <TextView
+                android:layout_height="wrap_content"
+                android:layout_width="wrap_content"
+                android:id="@+id/mtpd_minuteTitle"
+                android:text="@string/minutes"
+                android:padding="10dp"
+                android:gravity="center"/>
+        </TableRow>
+        <TableRow
+            android:gravity="center">
+
+            <EditText
+                android:id="@+id/mtpd_hourField"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:inputType="number"
+                android:maxLength="2"
+                android:padding="10dp"
+                android:singleLine="true" />
+
+            <EditText
+                android:id="@+id/mtpd_minuteField"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:inputType="number"
+                android:maxLength="2"
+                android:padding="10dp"
+                android:singleLine="true" />
+        </TableRow>
+        <TableRow
+            android:gravity="center">
+            <Button
+                android:id="@+id/mtpd_switch"
+                android:text="@string/switchMode"
+                android:gravity="center"/>
+        </TableRow>
+    </TableLayout>
+</FrameLayout>
+
+

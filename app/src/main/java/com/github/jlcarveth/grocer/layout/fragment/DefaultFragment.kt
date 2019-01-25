@@ -29,7 +29,7 @@ class DefaultFragment : Fragment() {
 
 
     companion object {
-        val FTAG = "DEFAULT"
+        val TAG = "DEFAULT"
 
         fun newInstance(): DefaultFragment {
             val fragment = DefaultFragment()
